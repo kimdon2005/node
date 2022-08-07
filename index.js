@@ -9,7 +9,7 @@ const app = express(); // define instance of express
 
 
 
-var port = "3000";  // set port number
+var port = "3001";  // set port number
 app.set('port', port); 
 
 app.use(express.static(path.join(__dirname, "clienat/build"))); // define to use that path file
@@ -48,7 +48,7 @@ app.post('/users', (req, res) => {
 
 
   
-var server = app.listen(3000, function () {
+var server = app.listen(3001, function () {
   var host = server.address().address;
   var port = server.address().port;
   
