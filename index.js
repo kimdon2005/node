@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path'); //get path
 const bodyParser = require("body-parser"); //import body-parser
 const connection   = require('./config/mysql.js');
-var router_1 = require('./router/firebase_route.js');
+var router_api = require('./router/api.js');
 
 // import express from "express";
 const app = express(); // define instance of express
@@ -12,8 +12,8 @@ const app = express(); // define instance of express
 var port = "3001";  // set port number
 app.set('port', port); 
 
-app.use(express.static(path.join(__dirname, "clienat/build"))); // define to use that path file
-app.use('/firebase',router_1);
+app.use(express.static(path.join(__dirname, "client/build"))); // define to use that path file
+app.use('/api',router_api);
 
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({extended: true}));
