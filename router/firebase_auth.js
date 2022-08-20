@@ -12,10 +12,12 @@ const auth = getAuth(app);
 const connection  = require('../config/mysql.js');
 
 
+
 var express = require('express');
 var router = express.Router();
 
 router.use('/',router_firebase_user);
+router.use(express.json());
 
 
 router.use(function(req, res, next) {
@@ -30,8 +32,8 @@ router.post('/signup', function(req, res){
     var request = req.body;
     var email = request.email;
     var password = request.password;
-    var student_id = connection.escape(request.student_id);
-    var school = connection.escape(request.school);
+    var student_id = request.student_id;
+    var school = request.school;
     var grade = request.grade;
     var class_ = request.class;
     var nickname = request.nickname;
@@ -41,13 +43,13 @@ router.post('/signup', function(req, res){
       .then((userCredential) => {
         // Signed in
         const user = userCredential.user;
-        if (connection.query(`select *\n from Class \n where School = ${school} and grade = ${grade} and class = ${class_} LIMIT 1`, 
+        if (connection.query(`select *\n from Class \n where School = '${school}' and grade = '${grade}' and class = '${class_}' LIMIT 1`, 
         function (error, results, fields) {
           if (error) throw error;
 
           if ( results[0] == null){
             idClass = Math.abs(parseInt(hashCode(school)/(10*grade))+class_);
-            connection.query(`INSERT INTO Class \n VALUES ( ${idClass}, '${school}', ${grade},${class_} );`,
+            connection.query(`INSERT INTO Class \n VALUES ( '${idClass}', '${school}', '${grade}','${class_}' );`,
             (error, rows) => {
             if (error){
                 throw error;
@@ -62,9 +64,11 @@ router.post('/signup', function(req, res){
           }
          )
         );
-        connection.query(`INSERT INTO User \n VALUES ( "${user.uid}", ${nickname}, ${profile}, ${student_id}, ${idClass});`,
+        connection.query(`INSERT INTO User \n VALUES ( '${user.uid}', '${nickname}', '${profile}', '${student_id}', '${idClass}');`,
         (error, rows) => {
-        if (error) throw error;
+        if (error) {
+          res.send(error);
+        };
         var obj_row = rows[0];
         res.send(Object.values(obj_row));
         } )
@@ -85,6 +89,8 @@ router.post('/signin', function(req, res){
 
   var email = request.id;
   var password = request.password;
+  console.log(email);
+  console.log(password);
 
   signInWithEmailAndPassword(auth, email, password)
   .then((userCredential) => {

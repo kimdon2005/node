@@ -7,7 +7,7 @@ connection.query("select *\n from Class \n where School = 'a' and grade = 2 and 
         function (error, results, fields) {
 
           if (error) throw error;
-          console.log(results[0] == null);
+          console.log(results[0]);
 
         })
 
