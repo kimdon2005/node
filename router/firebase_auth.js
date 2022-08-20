@@ -69,8 +69,7 @@ router.post('/signup', function(req, res){
         if (error) {
           res.send(error);
         };
-        var obj_row = rows[0];
-        res.send(Object.values(obj_row));
+        res.send(200);
         } )
         // ...
       })

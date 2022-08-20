@@ -24,15 +24,18 @@ router.post('/class',function(req, res){
     var school = request.school;
     var grade = request.grade;
     var class_ = request.class;
+    console.log(school);
+    console.log(grade);
+    console.log(class_);
+
     connection.query(`INSERT INTO Class \n VALUES ( '${Math.abs(parseInt(hashCode(school)/(10*grade))+class_)}', '${school}', ${grade},${class_} );`,
     (error, rows) => {
     if (error){
         res.send(error);
         throw error;
     };
-    var obj_row = rows[0];
 
-    res.send(Object.values(obj_row));
+    res.send(200);
     } );
 }
 );
