@@ -28,7 +28,7 @@ router.post('/class',function(req, res){
     console.log(grade);
     console.log(class_);
 
-    connection.query(`INSERT INTO Class \n VALUES ( '${Math.abs(parseInt(hashCode(school)/(10*grade))+class_)}', '${school}', ${grade},${class_} );`,
+    connection.query(`INSERT INTO Class \n VALUES ( '${Math.abs(parseInt(hashCode(school)/(10*grade))+class_)}', '${school}', '${grade}','${class_}' );`,
     (error, rows) => {
     if (error){
         res.send(error);
