@@ -69,7 +69,7 @@ router.post('/signup', function(req, res){
         if (error) {
           res.send(error);
         };
-        res.send(200);
+        res.status(200).send(200);
         } )
         // ...
       })
@@ -77,10 +77,11 @@ router.post('/signup', function(req, res){
         const errorCode = error.code;
         const errorMessage = error.message;
         console.log(errorMessage);
-        console.log(errorCode)
+        console.log(errorCode);
+        res.status(400).send(errorCode);
+        
         // ..
       });
-      res.send(200); 
     });
 
 router.post('/signin', function(req, res){
@@ -88,8 +89,6 @@ router.post('/signin', function(req, res){
 
   var email = request.id;
   var password = request.password;
-  console.log(email);
-  console.log(password);
 
   signInWithEmailAndPassword(auth, email, password)
   .then((userCredential) => {
@@ -97,22 +96,23 @@ router.post('/signin', function(req, res){
     const user = userCredential.user;
     console.log(user);
     res.send(200);
-
     // ...
   })
   .catch((error) => {
     const errorCode = error.code;
     const errorMessage = error.message;
-    console.log(errorMessage)
-    res.send(400);
+    console.log(errorMessage);
+    res.status(404).send(errorCode);
   });
 }
 )
 
 router.post('/signout', function(req, res){
   signOut(auth).then(() => {
+    res.status(200).send(200);
     // Sign-out successful.
   }).catch((error) => {
+    res.status(400).send(error.code);
     // An error happened.
   });
 })

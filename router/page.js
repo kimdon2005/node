@@ -13,8 +13,6 @@ router.get('/class',function(req, res){
     var school = request.school;
     var grade = request.grade;
     var class_ = request.class;
-    connection.query()
-
     res.send(school);
 }
 );
