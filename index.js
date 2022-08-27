@@ -26,7 +26,9 @@ app.get('/', function (req, res) {
 
 app.get('/users', (req, res) => {
   connection.query('SELECT * from people', (error, rows) => {
-    if (error) throw error;
+    if (error) {
+      res.send(error);
+    }
     console.log('User info is: ', rows);
     res.send(rows);
   });
@@ -40,7 +42,9 @@ app.post('/users', (req, res) => {
 
   var sql = `INSERT INTO people \n VALUES ( ${person_id}, ${person_name}, ${age}, ${birthday});`
   connection.query(sql, (error, rows) => {
-    if (error) throw error;
+    if (error) {
+      res.send(error);
+    }
     console.log('User info is: ', rows);
     res.send(rows);
   });

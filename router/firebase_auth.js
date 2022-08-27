@@ -2,8 +2,11 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword , signOut} from "firebase/auth";
 import firebaseConfig from "../config/firebase.json"
-
+const cookieParser = require('cookie-parser');
+import cookieConfig from "../config/cookie";
 var router_firebase_user = require('./firebase_user.js');
+
+
 
 
 // Initialize Firebase
@@ -17,7 +20,9 @@ var express = require('express');
 var router = express.Router();
 
 router.use('/',router_firebase_user);
+router.use(cookieParser());
 router.use(express.json());
+
 
 
 router.use(function(req, res, next) {
@@ -44,33 +49,41 @@ router.post('/signup', function(req, res){
         // Signed in
         const user = userCredential.user;
         if (connection.query(`select *\n from Class \n where School = '${school}' and grade = '${grade}' and class = '${class_}' LIMIT 1`, 
-        function (error, results, fields) {
-          if (error) throw error;
-
+        async function (error, results, fields) {
+          if (error){
+            console.log(error);
+          }
           if ( results[0] == null){
-            idClass = Math.abs(parseInt(hashCode(school)/(10*grade))+class_);
+            idClass = await Math.abs(parseInt(hashCode(school)/(10*grade))+class_);
             connection.query(`INSERT INTO Class \n VALUES ( '${idClass}', '${school}', '${grade}','${class_}' );`,
             (error, rows) => {
             if (error){
-                throw error;
+              console.log(error);
             };
             } );
           } else{
             idClass = results[0].idClass;
+            console.log(idClass);
           }
           
 
           console.log('The solution is: ', results);
+
+          connection.query(`INSERT INTO User \n VALUES ( '${user.uid}', '${nickname}', '${profile}', '${student_id}', '${idClass}');`,
+          (error, rows) => {
+          if (error) {
+            console.log(error);
+          }
+          } )
+          res.cookie('idUser', user.uid, cookieConfig);
+          res.cookie('idClass', idClass, cookieConfig);
+          res.status(200).send(200);
+
           }
          )
         );
-        connection.query(`INSERT INTO User \n VALUES ( '${user.uid}', '${nickname}', '${profile}', '${student_id}', '${idClass}');`,
-        (error, rows) => {
-        if (error) {
-          res.send(error);
-        };
-        res.status(200).send(200);
-        } )
+
+        // store cookie
         // ...
       })
       .catch((error) => {
@@ -79,41 +92,53 @@ router.post('/signup', function(req, res){
         console.log(errorMessage);
         console.log(errorCode);
         res.status(400).send(errorCode);
-        
         // ..
       });
     });
 
 router.post('/signin', function(req, res){
   var request = req.body;
-
   var email = request.id;
   var password = request.password;
-
+  let idClass;
   signInWithEmailAndPassword(auth, email, password)
   .then((userCredential) => {
     // Signed in
     const user = userCredential.user;
-    console.log(user);
-    res.send(200);
+
+    connection.query(`SELECT idClass FROM User \n WHERE idUser = '${user.uid}'`, 
+    (error, rows)=>{
+      if (error){
+        res.status(400).send(error.message);
+    };
+      console.log(rows);
+
+      idClass = rows[0].idClass;
+      res.cookie('idUser', user.uid, cookieConfig);
+      res.cookie('idClass', idClass, cookieConfig);// store cookie
+      res.send(200);
+    })
+
+
+
     // ...
   })
   .catch((error) => {
     const errorCode = error.code;
     const errorMessage = error.message;
+    console.log(errorCode)
     console.log(errorMessage);
-    res.status(404).send(errorCode);
+    res.send(400);
   });
 }
 )
 
 router.post('/signout', function(req, res){
   signOut(auth).then(() => {
-    res.status(200).send(200);
+    res.sendStatus(200);
     // Sign-out successful.
   }).catch((error) => {
-    res.status(400).send(error.code);
-    // An error happened.
+    res.sendStatus(400);    // An error happened.
   });
 })
 

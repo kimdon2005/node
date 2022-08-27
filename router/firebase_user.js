@@ -18,7 +18,7 @@ router.get('/user',function(req,res){
           const uid = user.uid;
           connection.query(`SELECT * FROM User \nWHERE User_id = '${uid}';`,
             (error, rows) => {
-            if (error) throw error;
+            var obj_row = rows[0];
 
             res.send(200);
             } 
