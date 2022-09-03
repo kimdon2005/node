@@ -4,7 +4,6 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword , s
 import firebaseConfig from "../config/firebase.json"
 const cookieParser = require('cookie-parser');
 import cookieConfig from "../config/cookie";
-var router_firebase_user = require('./firebase_user.js');
 
 
 
@@ -19,7 +18,6 @@ const connection  = require('../config/mysql.js');
 var express = require('express');
 var router = express.Router();
 
-router.use('/',router_firebase_user);
 router.use(cookieParser());
 router.use(express.json());
 
@@ -141,6 +139,8 @@ router.post('/signout', function(req, res){
     res.sendStatus(400);    // An error happened.
   });
 })
+
+
 
 function hashCode(s){
   return s.split("").reduce(function(a,b){a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);              
