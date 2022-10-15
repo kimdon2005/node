@@ -14,32 +14,23 @@ router.get('/', function(req, res){
     res.send('page');
 });
 
-router.get('/class',function(req, res){
+router.patch('/class',function(req, res){
     var request = req.body;
-    var school = request.school;
+    var school = request.school_id;
     var grade = request.grade;
     var class_ = request.class;
     let idClass;
     //class id
-    connection.query(`select idClass from Class \n WHERE School = '${school}' AND grade = '${grade}' AND class = '${class_}';`,
+
+    const sql = 'select WorkPage.idWorkPage, WorkPage.WorkPageName, WorkPage.date from Class right join WorkPage on Class.idClass = Workpage.ClassId WHERE Class.idSchool = ? AND Class.grade = ? AND Class.class = ?;'
+    const para = [school, grade, class_]
+    connection.query(sql, para,
     (error, rows) =>{
         if (error){
-            res.status(400).send(error);
+            res.status(400).send(error.message);
         };
-        if (rows[0] == null){
-            res.status(400).send(false);
-        }
-        idClass = rows[0].idClass;
-        
-        // get work_pages
-        connection.query(`select * from Work_page WHERE idClass = '${idClass}' Order by dateWork_page DESC limit 10;`,
-        (error, rows)=>{
-            if (error){
-                res.status(400).send(error);
-            };
-            res.status(200).send(rows);
-        }
-        );
+        res.status(200).send(rows)
+
     }
     )
 
@@ -50,27 +41,29 @@ router.get('/class',function(req, res){
 
 router.post('/class',function(req, res){
     var request = req.body;
-    var school = request.school;
+    var school = request.school_id;
     var grade = request.grade;
     var class_ = request.class;
     console.log(school);
     console.log(grade);
     console.log(class_);
-
-    connection.query(`INSERT INTO Class \n VALUES ( '${Math.abs(parseInt(hashCode(school)/(10*grade))+class_)}', '${school}', '${grade}','${class_}' );`,
+    const sql = 'INSERT INTO Class(idSchool, grade, class) \n VALUES ( ?, ?, ?);'
+    const para = [school, grade, class_]
+    connection.query(sql,para,
     (error, rows) => {
     if (error){
-        res.status(400).send(error.code);
+        res.status(400).send(error.message);
     };
         res.sendStatus(200);
     } );
 }
 );
 
-router.get('/workPage', function(req, res){
+router.patch('/workPage', function(req, res){
     var request = req.body;
     var idWork_page = request.idWork_page;
-    connection.query(`SELECT * FROM Posting WHERE idWork_page = '${idWork_page}'`, 
+    const sql = 'SELECT * FROM Posting WHERE idWorkPage = ?'
+    connection.query(sql, [idWork_page], 
     (error, rows)=>{
         if (error){
             res.send(error.code);
@@ -82,46 +75,132 @@ router.get('/workPage', function(req, res){
 router.post('/workPage', function(req, res){
     var request = req.body;
     var title = request.title;
-    var idClass = request.idClass;
+    var idClass = request.idClass; //한번에 하나씩만 등록 가능
     var idUser = req.cookies.idUser;
     var date = formatDate(new Date());
-    for( var i = 0; i < idClass.length ; i++){
-        connection.query(`INSERT INTO Work_page(idClass, idUser, dateWork_page, title) \n VALUES ('${idClass[i]}', '${idUser}', '${date}', '${title}')`,
-        (error, rows)=>{
-            if (error){
-                res.send(error.code);
-            }
-            res.status(200).send(200);
-        })
-    }
+    const sql = 'INSERT INTO WorkPage(ClassId, UserIdId, date, WorkPageName)  VALUES (?,?,?,?)' 
+    console.log(para);
+    const para = [idClass, idUser, date, title];
+    connection.query(sql,para,
+    (error, rows)=>{
+        if (error){
+            res.send(error.message);
+        }
+        res.sendStatus(200);
+    })
+    
 
+})
+
+router.put('/workPage', function(req, res){
+    var request =req.body;
+    var idWorkPage = request.idWorkPage;
+    var WorkPageName = request.WorkPageName;
+    var date = formatDate(new Date());
+    var idClass = request.idClass
+    const sql = 'UPDATE WorkPage SET WorkPageName = ?, date = ? , ClassId = ? WHERE idWorkPage = ?'
+    const para = [WorkPageName, date, idClass, idWorkPage]
+    connection.query(sql, para, (error, rows)=>{
+        if(error){
+            res.status(400).send(error.message)
+        }
+        res.sendStatus(200);
+    })
 })
 
 router.post('/posting', function(req, res){
     var request = req.body;
     var title = request.title;
     var content = request.content;
-    var file = request.fileUrl;
     var date = formatDate(new Date());
     var idWork_page = request.idWork_page;
     var idUser = req.cookies.idUser;
     var idStudent = request.idStudent;
-    connection.query(`INSERT INTO Posting(title, content, file_url, idWork_page, datePosting, idUser, idStudent) \n VALUES ('${title}', '${content}', '${file}', '${idWork_page}', '${date}', '${idUser}', '${idStudent}')`,
+    var idFile = request.idFile; //리스트로 값 받음 !!sql injection 주의
+
+    const sql = 'INSERT INTO Posting(title, content, date, idWorkPage, UserId, idStudent) \n VALUES (?,?,?,?,?,?)'
+    const para = [title, content, date, idWork_page, idUser, idStudent]
+    connection.query(sql,para,
     (error, rows)=>{
+        console.log(idFile.length);
         if (error){
-            res.send(error.code);
+            res.status(400).send(error.code);
         }
-        res.send(rows);
+        var sql1 = `UPDATE File SET idPosting = ${connection.escape(rows.insertId)} WHERE idFile = ${connection.escape(idFile[0])} `
+        for (var i = 1; i < idFile.length; i++){
+            sql1 = sql1 + `OR idFile = ${connection.escape(idFile[i])} `
+        }
+        connection.query(sql1, (error, rows)=>{
+            if(error){
+                res.status(500).send(error.message);
+            }
+            res.sendStatus(200);
+        })
+
         
     })
 
 })
 
+router.put('/posting', function(req, res){
+    var request = req.body;
+    var idPosting = request.idPosting;
+    var idStudent = request.idStudent;
+    var title = request.title;
+    var content = request.content;
+    var date = formatDate(new Date());
+    const sql = 'UPDATE Posting SET idStudent = ?, title = ?, content = ?, date = ? WHERE idPosting = ? ;';
+    const para = [idStudent, title, content, date, idPosting]
+    connection.query(sql, para, (error, rows)=>{
+        if(error){
+            res.status(400).send(error.message);
+        }
+        res.sendStatus(200);
 
+    })
+    
+})
 
-function hashCode(s){
-    return s.split("").reduce(function(a,b){a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);              
-};
+router.patch('/comment', function(req, res){
+    var idPosting = req.query.idPosting;
+    const sql = 'SELECT * FROM Comment WHERE PostingId = ?'
+    connection.query(sql, [idPosting], (error, rows)=>{
+        if(error){
+            res.status(400).send(error.message);
+        }
+        res.status(200).send(rows);
+    })    
+})
+
+router.post('/comment', function(req, res){
+    var request = req.body;
+    var idUser = req.cookies.idUser;
+    var idPosting = request.idPosting;
+    var content = request.content;
+    const sql = 'INSERT INTO Comment(idUser, content, PostingId) VALUES ( ?, ?, ?) '
+    const para = [idUser, content, idPosting]
+    connection.query(sql, para, (error, rows)=>{
+        if(error){
+            res.status(400).send(error.message);
+        }
+        res.sendStatus(200);
+    })
+})
+
+router.put('/comment', function(req, res){
+    var request = req.body;
+    var idComment = request.idComment;
+    var content = request.content;
+    const sql = 'UPDATE Comment SET content = ? WHERE idComment = ? '
+    const para = [content, idComment]
+    connection.query(sql, para, (error,rows)=>{
+        if(error){
+            res.status(400).send(error.message);
+        }
+        res.sendStatus(200);
+    })
+})
+
 
 function padTo2Digits(num) {
     return num.toString().padStart(2, '0');
