@@ -25,12 +25,13 @@ router.post('/image',function(req,res){
           return res.status(500).send(err);
         }
         var filepath = `src/images/${fileName}`;
-        connection.query(`INSERT INTO Image(pathImage) VALUES ('${filepath}')`,
+        const sql = 'INSERT INTO Image(filePath) VALUES( ? )'
+        connection.query(sql, [filepath],
         (error, rows)=>{
             if (error) {
                 return res.status(500).send(err);
               }
-            res.send(`${rows.insertId}`);
+            res.send(`${rows.insertId}`); // 파일 업로드 시 클라로 파일의 아이디 리턴
         })
       }
     );
@@ -46,13 +47,13 @@ router.post('/files',function(req,res){
       `${__dirname}/src/files/${fileName}`,
       function (err) {
         if (err) {
-          return res.status(500).send(err);
+          return res.status(500).send(err.message);
         }
         var filepath = `src/files/${fileName}`;
-        connection.query(`INSERT INTO Files(pathFiles) VALUES ('${filepath}')`,
+        connection.query('INSERT INTO File(filePath) VALUES (?)',[filepath],
         (error, rows)=>{
             if (error) {
-                return res.status(500).send(err);
+                return res.status(500).send(error.message);
               }
             res.send(`${rows.insertId}`);
         })
