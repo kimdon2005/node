@@ -38,6 +38,18 @@ router.post('/image',function(req,res){
 
 })
 
+router.patch('/image', function(req, res){
+  var idImage = req.query.id;
+  const sql = 'SELECT filePath FROM Image WHERE idImage = ?'
+
+  connection.query(sql, [idImage], (error, rows)=>{
+    if(error){
+      res.status(400).send(error.message);
+    }
+    res.status(200).send(rows);
+  })
+})
+
 router.post('/files',function(req,res){
     let __dirname = '/Users/gimdong-yun/server'
     // let __dirname = '/root/server/content'
@@ -60,6 +72,17 @@ router.post('/files',function(req,res){
       }
     );
 
+})
+
+router.patch('/files', function(req,res){
+  var id = req.query.id;
+  const sql = 'SELECT filePath FROM File WHERE idFile = ?';
+  connection.query(sql, [id], (error, rows)=>{
+    if(error){
+      res.status(400).send(error.message);
+    }
+    res.status(200).send(rows)
+  })
 })
 
 module.exports = router;
