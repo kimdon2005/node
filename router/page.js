@@ -74,10 +74,11 @@ router.post('/workPage', function(req, res){
     var title = request.title;
     var idClass = request.idClass; //한번에 하나씩만 등록 가능
     var idUser = req.cookies.idUser;
+    var content = request.content;
     var date = formatDate(new Date());
-    const sql = 'INSERT INTO WorkPage(ClassId, UserIdId, date, WorkPageName)  VALUES (?,?,?,?)' 
+    const sql = 'INSERT INTO WorkPage(ClassId, UserIdId, date, WorkPageName, content)  VALUES (?,?,?,?,? )' 
     console.log(para);
-    const para = [idClass, idUser, date, title];
+    const para = [idClass, idUser, date, title, content];
     connection.query(sql,para,
     (error, rows)=>{
         if (error){
@@ -93,10 +94,11 @@ router.put('/workPage', function(req, res){
     var request =req.body;
     var idWorkPage = request.idWorkPage;
     var WorkPageName = request.WorkPageName;
+    var content = request.content;
     var date = formatDate(new Date());
-    var idClass = request.idClass
-    const sql = 'UPDATE WorkPage SET WorkPageName = ?, date = ? , ClassId = ? WHERE idWorkPage = ?'
-    const para = [WorkPageName, date, idClass, idWorkPage]
+    var idClass = request.idClass;
+    const sql = 'UPDATE WorkPage SET WorkPageName = ?, date = ? , ClassId = ? , content = ? WHERE idWorkPage = ?';
+    const para = [WorkPageName, date, idClass, content , idWorkPage];
     connection.query(sql, para, (error, rows)=>{
         if(error){
             res.status(400).send(error.message)
@@ -133,6 +135,9 @@ router.post('/posting', function(req, res){
                 }
                 res.sendStatus(200);
             })
+        }
+        else{
+            res.sendStatus(200);
         }
 
 

@@ -14,8 +14,8 @@ router.use(function(req, res, next) {
 
 
 router.post('/image',function(req,res){
-    let __dirname = '/Users/gimdong-yun/server'
-    // let __dirname = '/root/server/content'
+    //let __dirname = '/Users/gimdong-yun/server'
+    let __dirname = '/root/server/content'
     let uploadFile = req.files.file
     const fileName = req.files.file.name
     uploadFile.mv(
@@ -51,8 +51,8 @@ router.patch('/image', function(req, res){
 })
 
 router.post('/files',function(req,res){
-    let __dirname = '/Users/gimdong-yun/server'
-    // let __dirname = '/root/server/content'
+    //let __dirname = '/Users/gimdong-yun/server'
+    let __dirname = '/root/server/content'
     let uploadFile = req.files.file
     const fileName = req.files.file.name
     uploadFile.mv(
