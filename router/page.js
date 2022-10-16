@@ -22,7 +22,7 @@ router.patch('/class',function(req, res){
     let idClass;
     //class id
 
-    const sql = 'select WorkPage.idWorkPage, WorkPage.WorkPageName, WorkPage.date from Class right join WorkPage on Class.idClass = Workpage.ClassId WHERE Class.idSchool = ? AND Class.grade = ? AND Class.class = ?;'
+    const sql = 'select WorkPage.idWorkPage, WorkPage.WorkPageName, WorkPage.date from Class right join WorkPage on Class.idClass = WorkPage.ClassId WHERE Class.idSchool = ? AND Class.grade = ? AND Class.class = ?;'
     const para = [school, grade, class_]
     connection.query(sql, para,
     (error, rows) =>{
