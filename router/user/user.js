@@ -58,7 +58,7 @@ router.post('/class', function(req, res){
     })
 })
 
-router.post('/school', function(req, res){
+router.patch('/school', function(req, res){
     var name = req.query.name;
     const sql = "SELECT * FROM School WHERE nameSchool like " + "'%" + name + "%'"
     console.log(sql)
@@ -66,8 +66,22 @@ router.post('/school', function(req, res){
         if(error){
             res.status(400).send(error.message);
         }
-        res.send(rows[0]);
+        res.send(rows);
     })
 })
+
+router.post('/school', function(req, res){
+    var name = req.query.name;
+    var region = req.query.region;
+
+    const sql = 'INSERT INTO School(nameSchool, region) VALUES ( ? , ? );'
+    connection.query(sql, [name, region], (error, rows)=>{
+        if(error){
+            res.status(400).send(error.message);
+        }
+        res.sendStatus(200);
+    })
+})
+
 
 module.exports = router;
