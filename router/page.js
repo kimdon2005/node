@@ -44,9 +44,6 @@ router.post('/class',function(req, res){
     var school = request.school_id;
     var grade = request.grade;
     var class_ = request.class;
-    console.log(school);
-    console.log(grade);
-    console.log(class_);
     const sql = 'INSERT INTO Class(idSchool, grade, class) \n VALUES ( ?, ?, ?);'
     const para = [school, grade, class_]
     connection.query(sql,para,
@@ -122,20 +119,22 @@ router.post('/posting', function(req, res){
     const para = [title, content, date, idWork_page, idUser, idStudent]
     connection.query(sql,para,
     (error, rows)=>{
-        console.log(idFile.length);
         if (error){
             res.status(400).send(error.code);
         }
-        var sql1 = `UPDATE File SET idPosting = ${connection.escape(rows.insertId)} WHERE idFile = ${connection.escape(idFile[0])} `
-        for (var i = 1; i < idFile.length; i++){
-            sql1 = sql1 + `OR idFile = ${connection.escape(idFile[i])} `
-        }
-        connection.query(sql1, (error, rows)=>{
-            if(error){
-                res.status(500).send(error.message);
+        if(idFile.length > 0){
+            var sql1 = `UPDATE File SET idPosting = ${connection.escape(rows.insertId)} WHERE idFile = ${connection.escape(idFile[0])} `
+            for (var i = 1; i < idFile.length; i++){
+                sql1 = sql1 + `OR idFile = ${connection.escape(idFile[i])} `
             }
-            res.sendStatus(200);
-        })
+            connection.query(sql1, (error, rows)=>{
+                if(error){
+                    res.status(500).send(error.message);
+                }
+                res.sendStatus(200);
+            })
+        }
+
 
         
     })

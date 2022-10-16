@@ -3,8 +3,17 @@ const path = require('path'); //get path
 const bodyParser = require("body-parser"); //import body-parser
 const connection   = require('./config/mysql.js');
 require('dotenv').config({ path: path.join(__dirname, './env/server.env') });//dotenv : env 로드 모듈 server.env 환경변수 가져오기
+const AdminBro = require('admin-bro')
+const AdminBroExpress = require('@admin-bro/express')
+
+
+const adminBro = new AdminBro({
+  databases: []
+})
+
 
 var router_api = require('./router/api.js');
+const router = AdminBroExpress.buildRouter(adminBro)
 
 
 const logger = require('./log/winston');
@@ -22,6 +31,7 @@ const app = express(); // define instance of express
 var port = "3001";  // set port number
 app.set('port', port); 
 
+app.use(adminBro.options.rootPath, router)
 app.use(express.static(path.join(__dirname, "client/build"))); // define to use that path file
 app.use('/api',router_api);
 app.use(morgan(morganFormat, {stream : logger.stream})); // morgan 로그 설정 
