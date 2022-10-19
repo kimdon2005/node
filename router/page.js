@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const connection   = require('../config/mysql.js');
 const cookieParser = require('cookie-parser');
+const { timeget } = require('../function/timeconvert.js');
 
 router.use(express.json());
 router.use(cookieParser());
@@ -75,10 +76,11 @@ router.post('/workPage', function(req, res){
     var idClass = request.idClass; //한번에 하나씩만 등록 가능
     var idUser = req.cookies.idUser;
     var content = request.content;
-    var date = formatDate(new Date());
-    const sql = 'INSERT INTO WorkPage(ClassId, UserIdId, date, WorkPageName, content)  VALUES (?,?,?,?,? )' 
+    var deadline = request.deadline;
+    var date = formatDate(timeget());
+    const sql = 'INSERT INTO WorkPage(ClassId, UserIdId, date, WorkPageName, content, deadline)  VALUES (?,?,?,?,?, ? )' 
     console.log(para);
-    const para = [idClass, idUser, date, title, content];
+    const para = [idClass, idUser, date, title, content, deadline];
     connection.query(sql,para,
     (error, rows)=>{
         if (error){
@@ -95,10 +97,11 @@ router.put('/workPage', function(req, res){
     var idWorkPage = request.idWorkPage;
     var WorkPageName = request.WorkPageName;
     var content = request.content;
-    var date = formatDate(new Date());
+    var date = formatDate(timeget());
     var idClass = request.idClass;
-    const sql = 'UPDATE WorkPage SET WorkPageName = ?, date = ? , ClassId = ? , content = ? WHERE idWorkPage = ?';
-    const para = [WorkPageName, date, idClass, content , idWorkPage];
+    var deadline = request.deadline;
+    const sql = 'UPDATE WorkPage SET WorkPageName = ?, date = ? , ClassId = ? , content = ? , deadline = ? WHERE idWorkPage = ?';
+    const para = [WorkPageName, date, idClass, content ,deadline , idWorkPage];
     connection.query(sql, para, (error, rows)=>{
         if(error){
             res.status(400).send(error.message)
@@ -111,7 +114,7 @@ router.post('/posting', function(req, res){
     var request = req.body;
     var title = request.title;
     var content = request.content;
-    var date = formatDate(new Date());
+    var date = formatDate(timeget());
     var idWork_page = request.idWork_page;
     var idUser = req.cookies.idUser;
     var idStudent = request.idStudent;
@@ -152,7 +155,7 @@ router.put('/posting', function(req, res){
     var idStudent = request.idStudent;
     var title = request.title;
     var content = request.content;
-    var date = formatDate(new Date());
+    var date = formatDate(timeget());
     const sql = 'UPDATE Posting SET idStudent = ?, title = ?, content = ?, date = ? WHERE idPosting = ? ;';
     const para = [idStudent, title, content, date, idPosting]
     connection.query(sql, para, (error, rows)=>{
@@ -205,6 +208,39 @@ router.put('/comment', function(req, res){
     })
 })
 
+router.post('/like', function(req, res){
+    var idPosting = req.query.idPosting;
+    var present_like = req.query.like;
+    present_like = Number(present_like) + 1;
+    const sql = 'UPDATE Posting SET liking = ? WHERE idPosting = ?';
+    const para = [present_like, idPosting];
+    connection.query(sql, para, (error, rows)=>{
+        if(error){
+            res.status(400).send(error.message);
+        }
+        else{
+            res.sendStatus(200);
+        }
+    })
+})
+
+router.put('/like', function(req, res){
+    var idPosting = req.query.idPosting;
+    var present_like = req.query.like;
+    present_like = Number(present_like) - 1 ;
+    const sql = 'UPDATE Posting SET liking = ? WHERE idPosting = ?';
+    const para = [present_like, idPosting];
+    connection.query(sql, para, (error, rows)=>{
+        if(error){
+            res.status(400).send(error.message);
+        }
+        else{
+            res.sendStatus(200);
+        }
+    })
+
+
+})
 
 function padTo2Digits(num) {
     return num.toString().padStart(2, '0');
