@@ -3,7 +3,7 @@ const winstonDaily = require('winston-daily-rotate-file');
 
 const { combine, timestamp, printf, colorize } = winston.format;
 
-const logDir = 'logs';  // logs 디렉토리 하위에 로그 파일 저장
+const logDir = '../../log';  // logs 디렉토리 하위에 로그 파일 저장
 
 const logFormat = printf(info => {
     return `${info.timestamp} ${info.level}: ${info.message}`;

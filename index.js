@@ -44,40 +44,6 @@ app.get('*', function (req, res) {
   res.sendFile(path.join(__dirname, '/client/build/index.html'))
 });
 
-app.get('/test/info', (req, res, next) => {
-  logger.info('info test');
-  res.status(200).send({
-      message : "info test!"
-  })
-});
-
-app.get('/users', (req, res) => {
-  connection.query('SELECT * from people', (error, rows) => {
-    if (error) {
-      res.send(error);
-    }
-    console.log('User info is: ', rows);
-    res.send(rows);
-  });
-});
-
-app.post('/users', (req, res) => {
-  var person_id = connection.escape(req.query.person_id);
-  var person_name = connection.escape(req.query.person_name);
-  var age = connection.escape(req.query.age);
-  var birthday = connection.escape(req.query.birthday);
-
-  var sql = `INSERT INTO people \n VALUES ( ${person_id}, ${person_name}, ${age}, ${birthday});`
-  connection.query(sql, (error, rows) => {
-    if (error) {
-      res.send(error);
-    }
-    console.log('User info is: ', rows);
-    res.send(rows);
-  });
-});
-
-
   
 var server = app.listen(3001, function () {
   var host = server.address().address;
