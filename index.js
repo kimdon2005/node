@@ -27,6 +27,10 @@ console.log(morganFormat);
 // import express from "express";
 const app = express(); // define instance of express
 
+let corsOptions = {
+  origin: "*", // 출처 허용 옵션
+  credential: true, // 사용자 인증이 필요한 리소스(쿠키 ..등) 접근
+};
 
 
 var port = "3001";  // set port number
@@ -40,7 +44,7 @@ app.use(morgan(morganFormat, {stream : logger.stream})); // morgan 로그 설정
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({extended: true}));
 
-app.use(cors()); //cors 문제 해결
+app.use(cors(corsOptions)); //cors 문제 해결
 
 
 
