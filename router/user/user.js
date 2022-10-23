@@ -3,6 +3,7 @@ var router = express.Router();
 const connection   = require('../../config/mysql.js');
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
+const logger = require('../../log/winston.js');
 
 router.use(express.json());
 router.use(cookieParser());
@@ -18,7 +19,8 @@ router.get('/',function(req,res){
     connection.query(sql, [idUser],
     (error, rows) => {
     if(error){
-        res.status(400).send(error.message)
+        res.status(400).send(error.message);
+        logger.error('ERROR GET /api/user ' + error.name);
     }
       res.send(rows[0]);
     } 
@@ -38,8 +40,10 @@ router.put('/', function(req,res){
     (error, rows)=>{
         if(error){
             res.send(error);
+            logger.error('ERROR PUT /api/user ' + error.name);
         }
         res.sendStatus(200);
+        logger.info('PUT /api/user ')
     })
 })
 
@@ -52,8 +56,10 @@ router.post('/class', function(req, res){
     connection.query(sql, para, (error, rows)=>{
         if(error){
             res.status(400).send(error.message);
+            logger.error('ERROR POST /api/user/class ' + error.name);
         }
         res.send(rows[0])
+        logger.info('POST /api/user/class ')
 
     })
 })
@@ -65,8 +71,12 @@ router.patch('/school', function(req, res){
     connection.query(sql, (error, rows)=>{
         if(error){
             res.status(400).send(error.message);
+            logger.error('ERROR POST /api/user/school ' + error.name);
+
         }
         res.send(rows);
+        logger.info('PATCH /api/user/school ');
+
     })
 })
 
@@ -78,8 +88,11 @@ router.post('/school', function(req, res){
     connection.query(sql, [name, region], (error, rows)=>{
         if(error){
             res.status(400).send(error.message);
+            logger.error('ERROR POST /api/user/school ' + error.name);
+
         }
         res.sendStatus(200);
+        logger.info('POST /api/user/school ');
     })
 })
 

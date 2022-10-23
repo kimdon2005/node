@@ -6,6 +6,7 @@ router.use(express.json());
 router.use(cookieParser());
 
 const connection  = require('../../config/mysql.js');
+const logger = require('../../log/winston.js');
 
 router.post('/signup', function(req, res){
     res.clearCookie("idUser");
@@ -23,10 +24,13 @@ router.post('/signup', function(req, res){
     connection.query(sql, para, (error, rows)=>{
         if(error){
             res.status(400).send(error.message);
+            logger.error('ERROR /api/auth/signup');
+
         }
         idUser = rows.insertId;
         res.cookie('idUser', idUser, {maxAge: 1000*60*60*24*7});
         res.cookie('idClass', idClass, {maxAge: 1000*60*60*24*7});
+        logger.info('POST /api/auth/signup');
         res.sendStatus(200);
     })
 
@@ -44,11 +48,13 @@ router.post('/signin', function(req, res){
     connection.query(sql, para, (error, rows)=>{
         if(error){
             res.status(400).send(error.message);
+            logger.error('ERROR /api/auth/signin ');
         }
         idClass = rows[0].idClass
         idUser = rows[0].idUser
         res.cookie('idUser', idUser, {maxAge: 1000*60*60*24*7});
         res.cookie('idClass', idClass, {maxAge: 1000*60*60*24*7});
+        logger.info('POST /api/auth/signin')
         res.send(`${rows[0].idClass}`);
 
     })
@@ -58,6 +64,7 @@ router.post('/signout', function(req, res){
   res.clearCookie("idUser");
   res.clearCookie("idClass");
   res.sendStatus(200);
+  logger.info('POST /api/auth/signout')
 })
 
 module.exports = router;

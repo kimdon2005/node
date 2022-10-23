@@ -3,6 +3,8 @@ var router = express.Router();
 const connection   = require('../config/mysql.js');
 const cookieParser = require('cookie-parser');
 const { timeget } = require('../function/timeconvert.js');
+const logger = require('../log/winston.js');
+const e = require('express');
 
 router.use(express.json());
 router.use(cookieParser());
@@ -13,6 +15,7 @@ router.use(function(req, res, next) {
 
 router.get('/', function(req, res){
     res.send('page');
+    logger.info('GET /api/page/ ');
 });
 
 router.patch('/class',function(req, res){
@@ -29,14 +32,14 @@ router.patch('/class',function(req, res){
     (error, rows) =>{
         if (error){
             res.status(400).send(error.message);
-        };
-        res.status(200).send(rows)
-
+            logger.error('ERROR PATCH /api/page/class '+ error.name);
+        }
+        else{
+            res.status(200).send(rows);
+            logger.info('PATCH /api/page/class');
+        }
     }
     )
-
-
-
 }
 );
 
@@ -51,8 +54,14 @@ router.post('/class',function(req, res){
     (error, rows) => {
     if (error){
         res.status(400).send(error.message);
-    };
+        logger.error('ERROR POST /api/page/class '+ error.name);
+
+    }
+    else{
         res.sendStatus(200);
+        logger.info('POST /api/page/class');
+    }
+
     } );
 }
 );
@@ -65,8 +74,13 @@ router.patch('/workPage', function(req, res){
     (error, rows)=>{
         if (error){
             res.send(error.code);
+            logger.error('ERROR PATCH /api/page/workPage '+ error.name);
         }
-        res.status(200).send(rows);
+        else{
+            res.status(200).send(rows);
+            logger.info('PATCH /api/page/workPage');
+
+        }
     })
 })
 
@@ -85,8 +99,14 @@ router.post('/workPage', function(req, res){
     (error, rows)=>{
         if (error){
             res.send(error.message);
+            logger.error('ERROR POST /api/page/workPage '+ error.name);
         }
-        res.sendStatus(200);
+        else{
+            res.sendStatus(200);
+            logger.info('POST /api/page/workPage');
+        }
+
+
     })
     
 
@@ -104,9 +124,15 @@ router.put('/workPage', function(req, res){
     const para = [WorkPageName, date, idClass, content ,deadline , idWorkPage];
     connection.query(sql, para, (error, rows)=>{
         if(error){
-            res.status(400).send(error.message)
+            res.status(400).send(error.message);
+            logger.error('ERROR PUT /api/page/workPage '+ error.name);
         }
-        res.sendStatus(200);
+        else{
+            res.sendStatus(200);
+            logger.info('PUT /api/page/workPage');
+        }
+
+
     })
 })
 
@@ -126,6 +152,7 @@ router.post('/posting', function(req, res){
     (error, rows)=>{
         if (error){
             res.status(400).send(error.code);
+            logger.error('ERROR POST /api/page/posting '+ error.name);
         }
         if(idFile.length > 0){
             var sql1 = `UPDATE File SET idPosting = ${connection.escape(rows.insertId)} WHERE idFile = ${connection.escape(idFile[0])} `
@@ -135,12 +162,19 @@ router.post('/posting', function(req, res){
             connection.query(sql1, (error, rows)=>{
                 if(error){
                     res.status(500).send(error.message);
+                    logger.error('ERROR POST /api/page/posting '+ error.name);
+
                 }
-                res.sendStatus(200);
+                else{
+                    logger.info('POST /api/page/posting');
+                    res.sendStatus(200);
+                }
+
             })
         }
         else{
             res.sendStatus(200);
+            logger.info('POST /api/page/posting');
         }
 
 
@@ -161,8 +195,14 @@ router.put('/posting', function(req, res){
     connection.query(sql, para, (error, rows)=>{
         if(error){
             res.status(400).send(error.message);
+            logger.error('ERROR PUT /api/page/posting '+ error.name);
         }
-        res.sendStatus(200);
+        else{
+            res.sendStatus(200);
+            logger.info('PUT /api/page/posting');
+        }
+
+
 
     })
     
@@ -174,8 +214,14 @@ router.patch('/comment', function(req, res){
     connection.query(sql, [idPosting], (error, rows)=>{
         if(error){
             res.status(400).send(error.message);
+            logger.error('ERROR PATCH /api/page/comment '+ error.name);
         }
-        res.status(200).send(rows);
+        else{
+            res.status(200).send(rows);
+            logger.info('PATCH /api/page/comment');
+        }
+
+
     })    
 })
 
@@ -189,8 +235,14 @@ router.post('/comment', function(req, res){
     connection.query(sql, para, (error, rows)=>{
         if(error){
             res.status(400).send(error.message);
+            logger.error('ERROR POST /api/page/comment '+ error.name);
         }
-        res.sendStatus(200);
+        else{
+            res.sendStatus(200);
+            logger.info('POST /api/page/comment ');
+        }
+
+
     })
 })
 
@@ -203,8 +255,15 @@ router.put('/comment', function(req, res){
     connection.query(sql, para, (error,rows)=>{
         if(error){
             res.status(400).send(error.message);
+            logger.error('ERROR PUT /api/page/comment '+ error.name);
+
         }
-        res.sendStatus(200);
+        else{
+            res.sendStatus(200);
+            logger.info('PUT /api/page/comment ');
+        }
+
+
     })
 })
 
@@ -217,8 +276,11 @@ router.post('/like', function(req, res){
     connection.query(sql, para, (error, rows)=>{
         if(error){
             res.status(400).send(error.message);
+            logger.error('ERROR POST /api/page/like '+ error.name);
+
         }
         else{
+            logger.info('POST /api/page/like');
             res.sendStatus(200);
         }
     })
@@ -233,8 +295,10 @@ router.put('/like', function(req, res){
     connection.query(sql, para, (error, rows)=>{
         if(error){
             res.status(400).send(error.message);
+            logger.error('ERROR PUT /api/page/like '+ error.name);
         }
         else{
+            logger.info('PUT /api/page/like ');
             res.sendStatus(200);
         }
     })

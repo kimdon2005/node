@@ -48,7 +48,7 @@ app.get('*', function (req, res) {
 var server = app.listen(3001, function () {
   var host = server.address().address;
   var port = server.address().port;
-  
+  logger.info('Server listening on port 3000');
   console.log('Server is working : PORT - ',port);
 });
 
