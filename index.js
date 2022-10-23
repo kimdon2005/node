@@ -5,6 +5,7 @@ const connection   = require('./config/mysql.js');
 require('dotenv').config({ path: path.join(__dirname, './env/server.env') });//dotenv : env 로드 모듈 server.env 환경변수 가져오기
 const AdminBro = require('admin-bro')
 const AdminBroExpress = require('@admin-bro/express')
+const cors = require('cors');
 
 
 const adminBro = new AdminBro({
@@ -39,9 +40,13 @@ app.use(morgan(morganFormat, {stream : logger.stream})); // morgan 로그 설정
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({extended: true}));
 
+app.use(cors()); //cors 문제 해결
+
+
 
 app.get('*', function (req, res) {
-  res.sendFile(path.join(__dirname, '/client/build/index.html'))
+  res.sendFile(path.join(__dirname, '/client/build/index.html'));
+  logger.info('GET / ');
 });
 
   
