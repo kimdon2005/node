@@ -69,7 +69,7 @@ router.post('/class',function(req, res){
 router.patch('/workPage', function(req, res){
     var request = req.body;
     var idWork_page = request.idWork_page;
-    const sql = 'SELECT * FROM Posting WHERE idWorkPage = ?'
+    const sql = 'SELECT p.idPosting, p.UserId, u.nickname, i.filePath, p.idStudent, p.title, p.content, p.date, p.liking FROM Posting AS p LEFT JOIN User AS u ON p.UserId = u.idUser LEFT JOIN Image AS i ON u.idImage = i.idImage WHERE idWorkPage = ? ;'
     connection.query(sql, [idWork_page], 
     (error, rows)=>{
         if (error){
