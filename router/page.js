@@ -18,11 +18,10 @@ router.get('/', function(req, res){
     logger.info('GET /api/page/ ');
 });
 
-router.patch('/class',function(req, res){
-    var request = req.body;
-    var school = request.school_id;
-    var grade = request.grade;
-    var class_ = request.class;
+router.get('/class',function(req, res){
+    var school = req.query.school_id;
+    var grade = req.query.grade;
+    var class_ = req.query.class;
     let idClass;
     //class id
 
@@ -67,8 +66,7 @@ router.post('/class',function(req, res){
 );
 
 router.patch('/workPage', function(req, res){
-    var request = req.body;
-    var idWork_page = request.idWork_page;
+    var idWork_page = req.query.idWork_page;
     const sql = 'SELECT p.idPosting, p.UserId, u.nickname, i.filePath, p.idStudent, p.title, p.content, p.date, p.liking FROM Posting AS p LEFT JOIN User AS u ON p.UserId = u.idUser LEFT JOIN Image AS i ON u.idImage = i.idImage WHERE idWorkPage = ? ;'
     connection.query(sql, [idWork_page], 
     (error, rows)=>{
