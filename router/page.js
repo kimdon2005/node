@@ -43,10 +43,9 @@ router.get('/class',function(req, res){
 );
 
 router.post('/class',function(req, res){
-    var request = req.body;
-    var school = request.school_id;
-    var grade = request.grade;
-    var class_ = request.class;
+    var school = req.query.school_id;
+    var grade = req.query.grade;
+    var class_ = req.query.class;
     const sql = 'INSERT INTO Class(idSchool, grade, class) \n VALUES ( ?, ?, ?);'
     const para = [school, grade, class_]
     connection.query(sql,para,
