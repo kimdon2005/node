@@ -57,7 +57,7 @@ router.post('/class',function(req, res){
 
     }
     else{
-        res.sendStatus(200);
+        res.send(rows.idClass);
         logger.info('POST /api/page/class');
     }
 
