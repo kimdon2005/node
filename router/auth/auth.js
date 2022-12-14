@@ -12,12 +12,11 @@ router.post('/signup', function(req, res){
     res.clearCookie("idUser");
     res.clearCookie("idClass");
 
-    var request = req.body;
-    var uid = request.uid;
-    var idClass = request.idClass;
-    var idStudent = request.idStudent;
-    var nickname = request.nickname;
-    var idImage = request.idImage;
+    var uid = req.query.uid;
+    var idClass = req.query.idClass;
+    var idStudent = req.query.idStudent;
+    var nickname = req.query.nickname;
+    var idImage = req.query.idImage;
     let idUser;
     const sql = 'INSERT INTO User(idClass, idStudent, nickname, idImage, idFirebase) VALUES ( ? , ? , ? , ? , ? )'
     const para = [idClass, idStudent, nickname, idImage, uid];
