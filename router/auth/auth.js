@@ -38,8 +38,7 @@ router.post('/signup', function(req, res){
 router.post('/signin', function(req, res){
     res.clearCookie("idUser");
     res.clearCookie("idClass");
-    var request = req.body;
-    var uid = request.uid;
+    var uid = req.query.uid;
     let idClass;
     let idUser;
     const sql = 'SELECT idClass, idUser FROM User WHERE idFirebase = ? '
