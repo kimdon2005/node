@@ -15,7 +15,7 @@ router.use(function(req, res, next) {
 
 router.get('/',function(req,res){
     var idUser = req.cookies.idUser;
-    const sql = 'SELECT * FROM User WHERE idUser = ? ;'
+    const sql = 'SELECT a.idStudent, a.nickname, b.grade, b.class , c.nameSchool, i.filePath FROM User AS a  LEFT JOIN Class as b on a.idClass = b.idClass LEFT JOIN School AS c ON b.idSchool = c.idSchool LEFT JOIN Image AS i ON a.idImage = i.idImage WHERE idUser = ? ;'
     connection.query(sql, [idUser],
     (error, rows) => {
     if(error){
