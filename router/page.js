@@ -13,9 +13,19 @@ router.use(function(req, res, next) {
     next();
 });
 
-router.get('/', function(req, res){
-    res.send('page');
-    logger.info('GET /api/page/ ');
+router.get('/classinfo', function(req, res){
+    var idClass = req.query.id;
+    const sql = 'select * from Class Where idClass = ?'
+    connection.query(sql,[idClass], (error, rows)=>{
+        if(error){
+            res.status(400).send(error.message);
+            logger.error('ERROR GET /api/page/classinfo '+ error.name);
+        }else{
+            res.status(200).send(rows);
+            logger.info('GET /api/page/classinfo');
+
+        }
+    })
 });
 
 router.get('/class',function(req, res){
