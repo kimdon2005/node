@@ -91,6 +91,23 @@ router.patch('/workPage', function(req, res){
     })
 })
 
+router.get('/workPage', function(req, res){
+    var idWork_page = req.query.idWork_page;
+    const sql = 'SELECT * FROM WorkPage WHERE idWorkPage = ?'
+    connection.query(sql, [idWork_page], 
+    (error, rows)=>{
+        if (error){
+            res.send(error.code);
+            logger.error('ERROR PATCH /api/page/workPage '+ error.name);
+        }
+        else{
+            res.status(200).send(rows);
+            logger.info('GET /api/page/workPage');
+
+        }
+    })
+})
+
 router.post('/workPage', function(req, res){
     var request = req.body;
     var title = request.title;
